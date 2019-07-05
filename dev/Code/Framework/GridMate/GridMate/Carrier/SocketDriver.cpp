@@ -1657,6 +1657,10 @@ namespace GridMate
                 AZ_Error("GridMate", false, "Could not allocate buffer: %u\n", ::WSAGetLastError());
                 return EC_SOCKET_CREATE;
             }
+
+#pragma warning( push )
+#pragma warning( disable : 4312)
+
             if (RIO_INVALID_BUFFERID == (recvBufferId = m_RIO_FN_TABLE.RIORegisterBuffer(m_rawRecvBuffer, bufferSize * m_RIORecvBufferCount)))
             {
                 AZ_Error("GridMate", false, "Could not register buffer: %u\n", ::WSAGetLastError());
@@ -1729,6 +1733,8 @@ namespace GridMate
                 AZ_Error("GridMate", false, "Could not register buffer: %u\n", ::WSAGetLastError());
                 return EC_SOCKET_CREATE;
             }
+
+#pragma warning( pop )
 
             //Init RIO Send buffers
             m_RIOSendBuffer.reserve(m_RIOSendBufferCount);
