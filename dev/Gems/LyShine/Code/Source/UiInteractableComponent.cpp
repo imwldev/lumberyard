@@ -506,6 +506,8 @@ void UiInteractableComponent::Reflect(AZ::ReflectContext* context)
     {
         behaviorContext->EBus<UiInteractableBus>("UiInteractableBus")
             ->Event("IsHandlingEvents", &UiInteractableBus::Events::IsHandlingEvents)
+			->Event("HandleHoverStart", &UiInteractableBus::Events::HandleHoverStart)
+			->Event("HandleEnterReleased", &UiInteractableBus::Events::HandleEnterReleased)
             ->Event("SetIsHandlingEvents", &UiInteractableBus::Events::SetIsHandlingEvents)
             ->Event("IsHandlingMultiTouchEvents", &UiInteractableBus::Events::IsHandlingMultiTouchEvents)
             ->Event("SetIsHandlingMultiTouchEvents", &UiInteractableBus::Events::SetIsHandlingMultiTouchEvents)

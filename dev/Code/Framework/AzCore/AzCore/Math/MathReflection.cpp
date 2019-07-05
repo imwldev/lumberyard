@@ -3177,6 +3177,13 @@ namespace AZ
                 Method("CreateFromMatrix3x3AndTranslation", &Transform::CreateFromMatrix3x3AndTranslation)->
                 Method("CreateScale", &Transform::CreateScale)->
                 Method("CreateDiagonal", &Transform::CreateDiagonal)->
+				Enum<(int)AZ::Transform::Axis::XPositive>("XPositive")->
+				Enum<(int)AZ::Transform::Axis::XNegative>("XNegative")->
+				Enum<(int)AZ::Transform::Axis::XPositive>("YPositive")->
+				Enum<(int)AZ::Transform::Axis::XNegative>("YNegative")->
+				Enum<(int)AZ::Transform::Axis::XPositive>("ZPositive")->
+				Enum<(int)AZ::Transform::Axis::XNegative>("ZNegative")->
+				Method("CreateLookAt", &Transform::CreateLookAt)->
                 Method("CreateTranslation", &Transform::CreateTranslation);
 
         // Uuid
