@@ -78,6 +78,57 @@ namespace EMotionFX
             }
         }
 
+		class BehaviorAnimGraphComponentNotificationBusHandler
+			: public AnimGraphComponentNotificationBus::Handler
+			, public AZ::BehaviorEBusHandler
+		{
+		public:
+			AZ_EBUS_BEHAVIOR_BINDER(
+				BehaviorAnimGraphComponentNotificationBusHandler, "{8FA3F23E-FAF7-4EB2-8FC4-A7C3035BF76D}", AZ::SystemAllocator
+				, OnAnimGraphInstanceCreated
+				, OnAnimGraphInstanceDestroyed
+				, OnAnimGraphFloatParameterChanged
+				, OnAnimGraphBoolParameterChanged
+				, OnAnimGraphStringParameterChanged
+				, OnAnimGraphVector2ParameterChanged
+				, OnAnimGraphVector3ParameterChanged
+				, OnAnimGraphRotationParameterChanged
+
+			);
+			void OnAnimGraphInstanceCreated(EMotionFX::AnimGraphInstance* animGraphInstance)
+			{
+				Call(FN_OnAnimGraphInstanceCreated, animGraphInstance);
+			}
+			void OnAnimGraphInstanceDestroyed(EMotionFX::AnimGraphInstance* animGraphInstance)
+			{
+				Call(FN_OnAnimGraphInstanceDestroyed, animGraphInstance);
+			}
+			void OnAnimGraphFloatParameterChanged(EMotionFX::AnimGraphInstance* animGraphInstance, AZ::u32 parameterIndex, float beforeValue, float afterValue) 
+			{
+				Call(FN_OnAnimGraphFloatParameterChanged, animGraphInstance, parameterIndex, beforeValue, afterValue);
+			}
+			void OnAnimGraphBoolParameterChanged(EMotionFX::AnimGraphInstance* animGraphInstance, AZ::u32 parameterIndex, bool beforeValue, bool afterValue) 
+			{
+				Call(FN_OnAnimGraphBoolParameterChanged, animGraphInstance, parameterIndex, beforeValue, afterValue);
+			}
+			void OnAnimGraphStringParameterChanged(EMotionFX::AnimGraphInstance* animGraphInstance, AZ::u32 parameterIndex, const char* beforeValue, const char* afterValue) 
+			{
+				Call(FN_OnAnimGraphStringParameterChanged, animGraphInstance, parameterIndex, beforeValue, afterValue); 
+			}
+			void OnAnimGraphVector2ParameterChanged(EMotionFX::AnimGraphInstance* animGraphInstance, AZ::u32 parameterIndex, const AZ::Vector2& beforeValue, const AZ::Vector2& afterValue) 
+			{
+				Call(FN_OnAnimGraphVector2ParameterChanged, animGraphInstance, parameterIndex, beforeValue, afterValue);
+			}
+			void OnAnimGraphVector3ParameterChanged(EMotionFX::AnimGraphInstance* animGraphInstance, AZ::u32 parameterIndex, const AZ::Vector3& beforeValue, const AZ::Vector3& afterValue) 
+			{
+				Call(FN_OnAnimGraphVector3ParameterChanged, animGraphInstance, parameterIndex, beforeValue, afterValue);
+			}
+			void OnAnimGraphRotationParameterChanged(EMotionFX::AnimGraphInstance* animGraphInstance, AZ::u32 parameterIndex, const AZ::Quaternion& beforeValue, const AZ::Quaternion& afterValue) 
+			{
+				Call(FN_OnAnimGraphRotationParameterChanged, animGraphInstance, parameterIndex, beforeValue, afterValue); 
+			}
+		};
+
         //////////////////////////////////////////////////////////////////////////
         void AnimGraphComponent::Reflect(AZ::ReflectContext* context)
         {
@@ -141,10 +192,11 @@ namespace EMotionFX
                     ->Event("DesyncAnimGraph", &AnimGraphComponentRequestBus::Events::DesyncAnimGraph)
                 ;
 
-                behaviorContext->EBus<AnimGraphComponentNotificationBus>("AnimGraphComponentNotificationBus")
-                    ->Attribute(AZ::Script::Attributes::ExcludeFrom, AZ::Script::Attributes::List)
-                    ->Event("OnAnimGraphInstanceCreated", &AnimGraphComponentNotificationBus::Events::OnAnimGraphInstanceCreated)
-                    ->Event("OnAnimGraphInstanceDestroyed", &AnimGraphComponentNotificationBus::Events::OnAnimGraphInstanceDestroyed)
+				behaviorContext->EBus<AnimGraphComponentNotificationBus>("AnimGraphComponentNotificationBus")
+    				//->Attribute(AZ::Script::Attributes::ExcludeFrom, AZ::Script::Attributes::Preview)
+					->Handler<BehaviorAnimGraphComponentNotificationBusHandler>()
+					->Event("OnAnimGraphInstanceCreated", &AnimGraphComponentNotificationBus::Events::OnAnimGraphInstanceCreated)
+					->Event("OnAnimGraphInstanceDestroyed", &AnimGraphComponentNotificationBus::Events::OnAnimGraphInstanceDestroyed)
                     ->Event("OnAnimGraphFloatParameterChanged", &AnimGraphComponentNotificationBus::Events::OnAnimGraphFloatParameterChanged)
                     ->Event("OnAnimGraphBoolParameterChanged", &AnimGraphComponentNotificationBus::Events::OnAnimGraphBoolParameterChanged)
                     ->Event("OnAnimGraphStringParameterChanged", &AnimGraphComponentNotificationBus::Events::OnAnimGraphStringParameterChanged)
@@ -428,6 +480,7 @@ namespace EMotionFX
                 }
 
                 // Notify listeners that the anim graph is ready.
+				//EBUS_EVENT_ID(GetEntityId(), AnimGraphComponentNotificationBus, OnAnimGraphInstanceCreated, m_animGraphInstance.get());
                 AnimGraphComponentNotificationBus::Event(
                     GetEntityId(),
                     &AnimGraphComponentNotificationBus::Events::OnAnimGraphInstanceCreated,
