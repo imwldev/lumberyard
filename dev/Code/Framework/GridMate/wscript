@@ -36,7 +36,7 @@ def build(bld):
 
         # Compiler Specific
         msvc_cxxflags   = [
-                           '/W4', # warning level
+                           '/W0', # warning level
                           ],
 
         # Platform Specific
