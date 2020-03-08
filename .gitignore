@@ -102,6 +102,7 @@
 /3rdParty
 /dev/AssetProcessorTemp
 /dev/BinTemp
+/dev/Cache
 /dev/Bin64
 /dev/Bin64vc141
 /dev/Bin64vc141.Debug
