@@ -57,6 +57,10 @@
     static const char* s_logFileName = "@log@/Game.log";
 #endif
 
+#include "ProjectDefines.h"
+#if defined (CVARS_WHITELIST)
+#include "../../IwMMO/Code/Include/IwMMO/IwMMOBus.h"
+#endif
 
 namespace
 {
@@ -199,6 +203,55 @@ namespace
         AZStd::unique_ptr<AZ::DynamicModuleHandle> m_moduleHandle;
     };
 #endif // AZ_TRAIT_LAUNCHER_USE_CRY_DYNAMIC_MODULE_HANDLE
+
+#if defined(CVARS_WHITELIST)
+#include "ISystem.h"
+	class CVarsWhitelist : public ICVarsWhitelist
+	{
+	public:
+		CVarsWhitelist() {
+			//TODO: Load white list from somewhere secure location
+            whitelist.insert("r_width");
+            whitelist.insert("r_height");
+            whitelist.insert("r_fullscreen");
+            whitelist.insert("r_ShadersAsyncCompiling");
+            whitelist.insert("r_ShadersAsyncActivation");
+            whitelist.insert("r_ShadersAsyncMaxThreads");
+            whitelist.insert("r_ShadesRemoteCompiler");
+            whitelist.insert("r_ShadersAllowCompilation");
+            whitelist.insert("r_AssetProcessorShaderCompiler");
+            whitelist.insert("r_ShaderCompilerServer");
+            whitelist.insert("r_GraphicsQuality");
+            whitelist.insert("sys_localization_format");
+            whitelist.insert("s_WwiseEnableCommSystem");
+
+            whitelist.insert("iw_gamelift_fleet_id");
+            whitelist.insert("iw_gamelift_aws_access_key");
+            whitelist.insert("iw_gamelift_aws_secret_key");
+            whitelist.insert("iw_gamelift_aws_region");
+            whitelist.insert("iw_gamelift_endpoint");
+            whitelist.insert("iw_gamelift_alias_id");
+            whitelist.insert("iw_gamelift_uselocalserver");
+            whitelist.insert("iw_vw_defaultcamera");
+            whitelist.insert("iw_ui_localjump");
+        };
+		bool IsWhiteListed(const string& commandLine, bool silent) override {
+            // Should evaluate cvar name only so consider left side of '=' character as the command name then trim the spaces.
+            size_t head = commandLine.find_first_not_of(" ");
+            size_t last = commandLine.find_first_of("=");
+            string commandOnly = commandLine.substr(head, last);
+            size_t trailingspace = commandOnly.find_last_not_of(" ");
+            string trimmed = commandOnly.substr(0, trailingspace+1);
+
+			auto it = find(whitelist.begin(), whitelist.end(), trimmed);
+            if (it == whitelist.end()) {
+                IW_Printf("IsWhiteList", "Not in whitelist:%s(%d,%d,%d)%s", commandLine.c_str(), head, trailingspace, last, trimmed.c_str());
+            }
+            return (it != whitelist.end());
+		};
+		std::set<string> whitelist;
+	};
+#endif
 
     void RunMainLoop(AzGameFramework::GameApplication& gameApplication)
     {
@@ -537,7 +590,9 @@ namespace LumberyardLauncher
                 azsnprintf(systemInitParams.userPath, AZ_MAX_PATH_LEN, "%s/user", writeStorage);
             }
         }
-
+#if defined(CVARS_WHITELIST)
+		systemInitParams.pCVarsWhitelist = new CVarsWhitelist;
+#endif
         // If there are no handlers for the editor game bus, attempt to load the legacy game dll instead
         bool legacyGameDllStartup = (EditorGameRequestBus::GetTotalNumOfEventHandlers() == 0);
 
@@ -637,7 +692,9 @@ namespace LumberyardLauncher
 
         gameApplication.Stop();
         AZ::Debug::Trace::Instance().Destroy();
-
+#if defined(CVARS_WHITELIST)
+		delete systemInitParams.pCVarsWhitelist;
+#endif
         return status;
     }
 }
