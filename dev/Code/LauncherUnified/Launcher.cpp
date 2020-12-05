@@ -224,6 +224,7 @@ namespace
             whitelist.insert("r_GraphicsQuality");
             whitelist.insert("sys_localization_format");
             whitelist.insert("s_WwiseEnableCommSystem");
+            whitelist.insert("gamelift_start_server");
 
             whitelist.insert("iw_gamelift_fleet_id");
             whitelist.insert("iw_gamelift_aws_access_key");
@@ -247,7 +248,11 @@ namespace
             if (it == whitelist.end()) {
                 IW_Printf("IsWhiteList", "Not in whitelist:%s(%d,%d,%d)%s", commandLine.c_str(), head, trailingspace, last, trimmed.c_str());
             }
+#ifdef DEDICATED_SERVER
+            return true;
+#else
             return (it != whitelist.end());
+#endif
 		};
 		std::set<string> whitelist;
 	};
