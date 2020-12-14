@@ -26,7 +26,7 @@ namespace Multiplayer
         CRY_ASSERT(gEnv->pNetwork);
         CRY_ASSERT(gEnv->pNetwork->GetGridMate());
 
-        GridMate::GameLiftServerServiceEventsBus::Handler::BusConnect(gEnv->pNetwork->GetGridMate());
+        //GridMate::GameLiftServerServiceEventsBus::Handler::BusConnect(gEnv->pNetwork->GetGridMate());
     }
 
     GameLiftListener::~GameLiftListener()
